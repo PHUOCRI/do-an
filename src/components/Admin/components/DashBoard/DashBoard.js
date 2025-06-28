@@ -1,0 +1,1 @@
+<img src={item.image} alt={item.name || ''} onError={e => {e.target.onerror=null; e.target.src='/img/default.jpg';}} /> 

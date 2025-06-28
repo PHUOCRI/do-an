@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test API</title>
+</head>
+<body>
+    <h2>Test API</h2>
+    <button onclick="registerUser()">Đăng ký User</button>
+    <button onclick="getProducts()">Lấy sản phẩm</button>
+    <button onclick="createSelectList()">Tạo Select List</button>
+    
+    <pre id="result"></pre>
+
+    <script>
+        let token = '';
+        let products = [];
+
+        async function registerUser() {
+            try {
+                const response = await fetch('http://localhost:4000/api/users/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        password: '123456'
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+                if (data.token) {
+                    token = data.token;
+                    console.log('Token:', token);
+                }
+            } catch (error) {
+                document.getElementById('result').textContent = error.toString();
+            }
+        }
+
+        async function getProducts() {
+            try {
+                const response = await fetch('http://localhost:4000/api/products/all');
+                const data = await response.json();
+                products = data;
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = error.toString();
+            }
+        }
+
+        async function createSelectList() {
+            if (!token || !products.length) {
+                document.getElementById('result').textContent = 'Vui lòng đăng ký và lấy sản phẩm trước';
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:4000/api/selectlists', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        products: [products[0]._id]
+                    })
+                });
+                const data = await response.json();
+                document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('result').textContent = error.toString();
+            }
+        }
+    </script>
+</body>
+</html> 
